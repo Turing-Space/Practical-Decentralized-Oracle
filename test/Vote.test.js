@@ -179,7 +179,7 @@ contract('Custodian', function (accounts) {
         });
     });
 
-    context('Perform anomaly reaction between two different kinds of IoT devices as Client contract', function () {
+    context('Perform reaction based on anomaly detection by two kinds of IoT devices as Client contract', function () {
 
         it("a new custodian, 3 temperature and 1 pressure IoT devices of client contracts are deployed", async function () {
             custodian = await Custodian.new();
