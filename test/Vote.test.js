@@ -2,12 +2,16 @@ const { assertRevert } = require("./helper/assertRevert");
 const { soliditySha3 } = require('web3-utils');
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
+const IoT_temp = artifacts.require("IoT_temp");
+const IoT_press = artifacts.require("IoT_press");
 
 let custodian;
 let client = []; // array of client contracts 
 let seq;
 let result;
 let totalVoters;
+let ioT_temp = [];
+let ioT_press = [];
 let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 
 contract('Custodian', function (accounts) {
@@ -85,7 +89,15 @@ contract('Custodian', function (accounts) {
             client[2] = await Client.new(custodian.address);
         });
 
-        it("client 2 vote true and becomes a new voter", async function(){
+        it("check voting camp for new seq hasn't finished", async function(){
+            // record seq before vote
+            seq = await custodian.newly_opened_seq();
+
+            // camp hasn't finished
+            assert.equal(await custodian.campHasFinished(seq), false);
+        });
+
+        it("client 2 vote true and becomes a new voter", async function(){    
             // client 2 vote and become a new voter
             await client[2].vote(true); 
 
@@ -106,7 +118,7 @@ contract('Custodian', function (accounts) {
             assert.equal(await client[2].queryFinalState(), finalResult.true); 
         });
 
-        it("previous but not current voter can query final state", async function(){
+        it("past voter can still query final state", async function(){
             // client 1 can also query the latest state without voting 
             assert.equal(await client[1].queryFinalState(), finalResult.true);  
         });        
@@ -127,6 +139,128 @@ contract('Custodian', function (accounts) {
             assert.equal(totalVoters, 3);
         });
 
+    });
+
+    context('Four participants, four voters', function () {
+
+        it("check voting camp for new seq hasn't finished", async function(){
+            // record seq before vote
+            seq = await custodian.newly_opened_seq();
+
+            // camp hasn't finished
+            assert.equal(await custodian.campHasFinished(seq), false);
+        });
+
+        it("client 3 vote for false and becomes a new voter", async function () {
+            await client[3].vote(false); 
+
+            // 4 voters in total now
+            totalVoters = await custodian.numOfTotalVoterClients();  
+            assert.equal(totalVoters, 4);
+        });
+
+        it("client 0 vote true", async function(){
+            // client 0 vote for true
+            await client[0].vote(false); 
+        });
+
+        it("client 1 vote true", async function(){
+            // client 0 vote for true
+            await client[1].vote(true); 
+        });
+
+        it("voting camp ends and agreement reached = false", async function(){
+            // camp finished because 2/3 = 66.6% voters vote
+            assert.equal(await custodian.campHasFinished(seq), true);
+            assert.equal(await client[0].queryFinalState(), finalResult.false); 
+            assert.equal(await client[1].queryFinalState(), finalResult.false); 
+            assert.equal(await client[2].queryFinalState(), finalResult.false); 
+            assert.equal(await client[3].queryFinalState(), finalResult.false); 
+        });
+    });
+
+    context('Perform anomaly reaction between two different kinds of IoT devices as Client contract', function () {
+
+        it("a new custodian, 3 temperature and 1 pressure IoT devices of client contracts are deployed", async function () {
+            custodian = await Custodian.new();
+            ioT_temp[0] = await IoT_temp.new(custodian.address);
+            ioT_temp[1] = await IoT_temp.new(custodian.address);
+            ioT_temp[2] = await IoT_temp.new(custodian.address);
+            ioT_press[0] = await IoT_press.new(custodian.address);
+        });
+
+        it("ioT_temp 0 joins and vote true, agreement = true", async function () {
+            // before vote
+            seq = await custodian.newly_opened_seq();
+            assert.equal(await custodian.campHasFinished(seq), false);
+
+            // vote
+            await ioT_temp[0].vote(true); 
+
+            // 1 voters in total now
+            totalVoters = await custodian.numOfTotalVoterClients();  
+            assert.equal(totalVoters, 1);
+            
+            // after vote 
+            assert.equal(await custodian.campHasFinished(seq), true);
+            assert.equal(await ioT_temp[0].queryFinalState(), finalResult.true); 
+        });
+
+        it("ioT_temp 1 joins and vote true, ioT_temp 0 still votes true, agreement = true", async function () {
+            // before vote
+            seq = await custodian.newly_opened_seq();
+            assert.equal(await custodian.campHasFinished(seq), false);
+
+            // vote
+            await ioT_temp[1].vote(true); 
+            await ioT_temp[0].vote(true); 
+
+            // 2 voters in total now
+            totalVoters = await custodian.numOfTotalVoterClients();  
+            assert.equal(totalVoters, 2);
+            
+            // after vote 
+            assert.equal(await custodian.campHasFinished(seq), true);
+            assert.equal(await ioT_temp[0].queryFinalState(), finalResult.true); 
+            assert.equal(await ioT_temp[1].queryFinalState(), finalResult.true); 
+        });
+
+        it("ioT_temp 2 joins and vote false, ioT_temp 0 votes true, agreement = no agreement", async function () {
+            // before vote
+            seq = await custodian.newly_opened_seq();
+            assert.equal(await custodian.campHasFinished(seq), false);
+
+            // vote
+            await ioT_temp[2].vote(false); 
+            await ioT_temp[0].vote(true); 
+            
+            // 3 voters in total now
+            totalVoters = await custodian.numOfTotalVoterClients();  
+            assert.equal(totalVoters, 3);
+            
+            // after vote 
+            assert.equal(await custodian.campHasFinished(seq), true);
+            assert.equal(await ioT_temp[0].queryFinalState(), finalResult.noAgreement); 
+        });
+
+        it("ioT_press 0 joins and vote false, ioT_temp 0 votes true, ioT_temp 1 votes false, agreement = false", async function () {
+            // before vote
+            seq = await custodian.newly_opened_seq();
+            assert.equal(await custodian.campHasFinished(seq), false);
+
+            // vote
+            await ioT_press[0].vote(false); 
+            await ioT_temp[0].vote(true); 
+            await ioT_temp[1].vote(false); 
+            
+            // 4 voters in total now
+            totalVoters = await custodian.numOfTotalVoterClients();  
+            assert.equal(totalVoters, 4);
+            
+            // after vote 
+            assert.equal(await custodian.campHasFinished(seq), true);
+            assert.equal(await ioT_temp[0].queryFinalState(), finalResult.false); 
+        });
     });
 
 });
