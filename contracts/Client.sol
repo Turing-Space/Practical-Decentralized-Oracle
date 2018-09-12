@@ -5,8 +5,6 @@ import "./Custodian.sol";
 contract Client {
     bytes32 public seq;
 
-    event VoteCampFinished(bytes32 seq, uint8 finalResult);
-  
     Custodian C;
     mapping (bytes32 => uint8) public finalResultOnCamp;   // 0 as not finalized, 1 as true, 2 as false
     
@@ -19,8 +17,6 @@ contract Client {
         
         if(voteCampFinished) {
             storeFinalState();
-            emit VoteCampFinished(seq, finalResultOnCamp[seq]);
-
             syncToNewlyOpenedSeq();
         }
     }
