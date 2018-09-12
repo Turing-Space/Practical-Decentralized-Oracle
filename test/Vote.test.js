@@ -13,7 +13,7 @@ contract('Custodian', function (accounts) {
     context('Single participant', function () {
 
         it("deploy custodian contract", async function(){
-            custodian = Custodian.new();
+            custodian = await Custodian.new();
         });
 
         it("should deploy one new client contract", async function () {
@@ -26,7 +26,6 @@ contract('Custodian', function (accounts) {
             assert.equal(seq, 0);
 
             // vote 
-            // TODO: don't know why this line reverts
             result = await client[0].vote(true); 
 
             // vote camp finished since reaching > 60% total number of clients 

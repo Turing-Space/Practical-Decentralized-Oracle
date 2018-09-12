@@ -23,7 +23,7 @@ contract Custodian is Ownable {
         address client = msg.sender;
         
         // Each client has single vote on a Seq
-        if (clientHasVotedOnSeq[client][_seq]) revert();
+        if (clientHasVotedOnSeq[client][_seq]) revert("Each client can only vote once");
         clientHasVotedOnSeq[client][_seq] = true;
         
         // Check clientIsKnown, maintain the growth of the voters' population
@@ -34,7 +34,7 @@ contract Custodian is Ownable {
         
         // update start time if this is the first vote on this camp ID
         if (votesCountOnCamp[_seq] == 0) {      // Unknown sequence
-            startTimeOnCamp[_seq] = now;
+            startTimeOnCamp[_seq] = block.timestamp;
         } 
         
         // update total counts
@@ -49,14 +49,14 @@ contract Custodian is Ownable {
         
         // check finalization
         // threshiold of participanst OR timeout
-        if ((votesCountOnCamp[_seq] > (THRESHOLD_OF_PARTICIPANTS * numOfTotalClients / 100)) 
-            || (now >= startTimeOnCamp[_seq] + TIMEOUT)) {
+        if ((votesCountOnCamp[_seq] > (THRESHOLD_OF_PARTICIPANTS * numOfTotalClients / 100)) ||
+            (block.timestamp >= startTimeOnCamp[_seq] + TIMEOUT)) {
             if (currVotesBalanceOnCamp[_seq] > 0) { 
                 finalResultOnCamp[_seq] = 1;
             } else if (currVotesBalanceOnCamp[_seq] < 0) {
                 finalResultOnCamp[_seq] = 2;
             } // 0 do nothing
-            newly_opened_seq = keccak256(_seq);
+            newly_opened_seq = keccak256(abi.encodePacked(_seq));
             
             return true;
         } 
