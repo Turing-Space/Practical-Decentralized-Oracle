@@ -24,13 +24,14 @@ contract('Custodian', function (accounts) {
         });
 
         it("client 0 vote for true", async function () {
-            // seq before vote
+            // check seq before vote
             seq = await client[0].seq();
             assert.equal(seq, 0);
 
-            // vote 
             await client[0].vote(true); 
+        });
 
+        it("consensus/agreement reached = true", async function () {
             // vote camp finished since reaching > 60% total number of clients 
             // only client 0 votes
             assert.equal(await custodian.campHasFinished(seq), true);
@@ -63,7 +64,9 @@ contract('Custodian', function (accounts) {
         it("client 0 vote for true", async function(){
             // client 0 vote true for the latest camp
             await client[0].vote(true); 
+        });
 
+        it("voting camp ends and no agreement is reached", async function(){
             // vote camp finished since reaching > 60% total number of clients 
             // client 0 and 1 both have to vote to reach consensus (if not considering timeout)
             // since client 0 vote for false and client 1 vote for true, no agreement is reached
@@ -78,30 +81,31 @@ contract('Custodian', function (accounts) {
             client[2] = await Client.new(custodian.address);
         });
 
-        it("client 2 doesn't vote", async function(){
-            // client 2 has not been synced to latest
-            assert.notEqual(await custodian.newly_opened_seq(), await client[2].seq());
-        })
-
-        it("client 2 vote true and becomes a network participant", async function(){
+        it("client 2 vote true and becomes a new voter", async function(){
             // client 2 vote and become a new voter
             await client[2].vote(true); 
 
             // 3 voters in total now
             totalVoters = await custodian.numOfTotalVoterClients();  
             assert.equal(totalVoters, 3);
+        });
 
+        it("client 0 vote true", async function(){
             // client 0 vote for true
             await client[0].vote(true); 
+        });
 
+        it("voting camp ends and agreement reached = true", async function(){
             // camp finished because 2/3 = 66.6% voters vote
             assert.equal(await custodian.campHasFinished(seq), true);
             assert.equal(await client[0].queryFinalState(), finalResult.true); 
             assert.equal(await client[2].queryFinalState(), finalResult.true); 
+        });
 
+        it("previous but not current voter can query final state", async function(){
             // client 1 can also query the latest state without voting 
             assert.equal(await client[1].queryFinalState(), finalResult.true);  
-        });
+        });        
 
     });
 
