@@ -51,7 +51,7 @@ contract('Custodian', function (accounts) {
             client[1] = await Client.new(custodian.address);
         });
 
-        it("client 1 vote for false", async function () {
+        it("client 1 vote before sync", async function(){
             // seq before vote
             seq = await client[1].seq();
             assert.equal(seq, 0);
@@ -63,7 +63,10 @@ contract('Custodian', function (accounts) {
             // even numOfTotalClients and votesCountOnCamp will not be updated
             // only final result for the previous seq has been updated
             assert.equal(finalResult.true, await client[1].finalResultOnCamp(seq));
+        });
 
+        it("client 1 vote for false after sync", async function () {
+            
             // client 1 sync to the network
             await client[1].syncToNewlyOpenedSeq(); 
             seq = await client[1].seq(); 
@@ -76,7 +79,9 @@ contract('Custodian', function (accounts) {
 
             // new camp still hasn't finished because only 50% voter votes
             assert.equal(await custodian.campHasFinished(seq), false);
+        });
 
+        it("client 0 vote for true", async function(){
             // client 0 sync or not doesn't matter (seq remains the same)
             seq = await client[0].seq();
             await await client[0].syncToNewlyOpenedSeq();
@@ -90,7 +95,16 @@ contract('Custodian', function (accounts) {
             // since client 0 vote for false and client 1 vote for true, no agreement is reached
             assert.equal(await custodian.campHasFinished(seq), true);
             assert.equal(await client[1].finalResultOnCamp(seq), finalResult.noAgreement); 
+        })
+    });
+
+    context('Three participants', function () {
+
+        it("another new client contract is deployed", async function () {
+            client[2] = await Client.new(custodian.address);
         });
+
+        
     });
 
 });
