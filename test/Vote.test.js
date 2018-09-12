@@ -223,6 +223,12 @@ contract('Custodian', function (accounts) {
             assert.equal(await custodian.campHasFinished(seq), true);
             assert.equal(await ioT_temp[0].queryFinalState(), finalResult.true); 
             assert.equal(await ioT_temp[1].queryFinalState(), finalResult.true); 
+
+            // perform action on anomaly case
+            result = await ioT_temp[0].adjustTemp();
+            assert.equal(result.logs[0].event, "CoolDown");
+            result = await ioT_temp[1].adjustTemp();
+            assert.equal(result.logs[0].event, "CoolDown");
         });
 
         it("ioT_temp 2 joins and vote false, ioT_temp 0 votes true, agreement = no agreement", async function () {
