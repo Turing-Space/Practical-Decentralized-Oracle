@@ -46,36 +46,9 @@ contract('Custodian', function (accounts) {
 
         it("another new client contract is deployed", async function () {
             client[1] = await Client.new(custodian.address);
-
-            // TODO: client can register to a custodian by paying an entry fee to be one of the voters  
-            // kick out the silent client (which doesn't vote after some seq) -> like your membership will expire
-            // problem: client must vote?? yes, in order to have some right to participate in this vote camp and involve in a voting decision, u must vote continuously, otherwise u can just query  
-
-            // TODO: let client pay a small fee when voting
-
         });
 
-        // it("client 1 vote before sync", async function(){
-        //     // seq before vote
-        //     seq = await client[1].seq();
-        //     assert.equal(seq, 0);
-
-        //     // client 1 vote without sync to network (vote to a finished camp)
-        //     await client[1].vote(false); 
-
-        //     // nothing will happen without syncing
-        //     // even numOfTotalClients and votesCountOnCamp will not be updated
-        //     // only final result for the previous seq has been updated
-        //     assert.equal(finalResult.true, await client[1].queryFinalState());
-        // });
-
         it("client 1 vote for false", async function () {
-            
-            // client 1 sync to the network
-            // await client[1].syncToNewlyOpenedSeq(); 
-            // seq = await client[1].seq(); 
-            // assert.equal(seq, await custodian.newly_opened_seq());
-
             // new camp hasn't finished
             seq = await custodian.newly_opened_seq();
             assert.equal(await custodian.campHasFinished(seq), false);
@@ -88,11 +61,6 @@ contract('Custodian', function (accounts) {
         });
 
         it("client 0 vote for true", async function(){
-            // // client 0 sync or not doesn't matter (seq remains the same)
-            // seq = await client[0].seq();
-            // await await client[0].syncToNewlyOpenedSeq();
-            // assert.equal(seq, await client[0].seq());
-
             // client 0 vote true for the latest camp
             await client[0].vote(true); 
 
@@ -113,12 +81,6 @@ contract('Custodian', function (accounts) {
         it("client 2 doesn't vote", async function(){
             // client 2 has not been synced to latest
             assert.notEqual(await custodian.newly_opened_seq(), await client[2].seq());
-
-            // // client 2 sync
-            // // TODO: why not always sync to latest before voting?
-            // await client[2].syncToNewlyOpenedSeq(); 
-            // seq = await client[2].seq(); 
-            // assert.equal(seq, await custodian.newly_opened_seq());
         })
 
         it("client 2 vote true and becomes a network participant", async function(){
@@ -126,7 +88,7 @@ contract('Custodian', function (accounts) {
             await client[2].vote(true); 
 
             // 3 voters in total now
-            totalVoters = await custodian.numOfTotalVoterClients();  // TODO: changed to total voters?
+            totalVoters = await custodian.numOfTotalVoterClients();  
             assert.equal(totalVoters, 3);
 
             // client 0 vote for true
@@ -137,14 +99,8 @@ contract('Custodian', function (accounts) {
             assert.equal(await client[0].queryFinalState(), finalResult.true); 
             assert.equal(await client[2].queryFinalState(), finalResult.true); 
 
-            // client 1 does not know the latest state because he didn't participate in last vote camp 
-            assert.equal(await client[1].queryFinalState(), finalResult.true); 
-            // assert.equal(await client[1].queryFinalState(), finalResult.noAgreement); 
-
-            // // in order to know latest state, client 1 must vote to be updated
-            // await client[1].vote(true);
-
-            // enter next round of voting, however, there must be someone that is not the voter cause > 60% 
+            // client 1 can also query the latest state without voting 
+            assert.equal(await client[1].queryFinalState(), finalResult.true);  
         });
 
     });
