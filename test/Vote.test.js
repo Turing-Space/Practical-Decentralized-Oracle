@@ -38,8 +38,8 @@ contract('Custodian', function (accounts) {
             assert.equal(await client[0].queryFinalState(), finalResult.true); 
         });
 
-        it("client 0 should not be able to vote again", async function(){
-            assertRevert(await client[0].vote(true)); 
+        it("client 0 can vote again after the previous vote camp ends", async function(){
+            await client[0].vote(true); 
         });
     });
 
@@ -59,6 +59,10 @@ contract('Custodian', function (accounts) {
 
             // new camp still hasn't finished because only 50% voter votes
             assert.equal(await custodian.campHasFinished(seq), false);
+        });
+
+        it("client 1 should not be able to vote again", async function(){
+            await assertRevert(client[1].vote(true)); 
         });
 
         it("client 0 vote for true", async function(){
