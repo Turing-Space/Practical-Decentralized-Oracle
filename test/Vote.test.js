@@ -189,13 +189,13 @@ contract('Custodian', function (accounts) {
             ioT_press[0] = await IoT_press.new(custodian.address);
         });
 
-        it("ioT_temp 0 joins and vote true, agreement = true", async function () {
+        it("ioT_temp 0 joins and log 50 degrees for temp, agreement on anomaly = true", async function () {
             // before vote
             seq = await custodian.newly_opened_seq();
             assert.equal(await custodian.campHasFinished(seq), false);
 
             // vote
-            await ioT_temp[0].vote(true); 
+            await ioT_temp[0].logTemperature(50); 
 
             // 1 voters in total now
             totalVoters = await custodian.numOfTotalVoterClients();  
@@ -206,15 +206,15 @@ contract('Custodian', function (accounts) {
             assert.equal(await ioT_temp[0].queryFinalState(), finalResult.true); 
         });
 
-        it("ioT_temp 1 joins and vote true, ioT_temp 0 still votes true, agreement = true", async function () {
+        it("ioT_temp 1 joins and logs 60 degree, ioT_temp 0 logs 50, agreement on anomaly = true", async function () {
             // before vote
             seq = await custodian.newly_opened_seq();
             assert.equal(await custodian.campHasFinished(seq), false);
 
             // vote
-            await ioT_temp[1].vote(true); 
-            await ioT_temp[0].vote(true); 
-
+            await ioT_temp[1].logTemperature(60); 
+            await ioT_temp[0].logTemperature(50); 
+ 
             // 2 voters in total now
             totalVoters = await custodian.numOfTotalVoterClients();  
             assert.equal(totalVoters, 2);
@@ -222,23 +222,26 @@ contract('Custodian', function (accounts) {
             // after vote 
             assert.equal(await custodian.campHasFinished(seq), true);
             assert.equal(await ioT_temp[0].queryFinalState(), finalResult.true); 
-            assert.equal(await ioT_temp[1].queryFinalState(), finalResult.true); 
+            assert.equal(await ioT_temp[1].queryFinalState(), finalResult.true);        
+        });
 
-            // perform action on anomaly case
+        it("All, even non-voter, IoT devices perform action on anomaly case", async function () {
             result = await ioT_temp[0].adjustTemp();
             assert.equal(result.logs[0].event, "CoolDown");
             result = await ioT_temp[1].adjustTemp();
             assert.equal(result.logs[0].event, "CoolDown");
+            result = await ioT_temp[2].adjustTemp();
+            assert.equal(result.logs[0].event, "CoolDown");
         });
 
-        it("ioT_temp 2 joins and vote false, ioT_temp 0 votes true, agreement = no agreement", async function () {
+        it("ioT_temp 2 joins and log 30 degree (normal), ioT_temp 0 still logs 45, agreement on anomaly = no agreement", async function () {
             // before vote
             seq = await custodian.newly_opened_seq();
             assert.equal(await custodian.campHasFinished(seq), false);
 
             // vote
-            await ioT_temp[2].vote(false); 
-            await ioT_temp[0].vote(true); 
+            await ioT_temp[2].logTemperature(30); 
+            await ioT_temp[0].logTemperature(45); 
             
             // 3 voters in total now
             totalVoters = await custodian.numOfTotalVoterClients();  
@@ -249,15 +252,15 @@ contract('Custodian', function (accounts) {
             assert.equal(await ioT_temp[0].queryFinalState(), finalResult.noAgreement); 
         });
 
-        it("ioT_press 0 joins and vote false, ioT_temp 0 votes true, ioT_temp 1 votes false, agreement = false", async function () {
+        it("ioT_press 0 joins and logs 50 for pressure (normal), ioT_temp 0 logs 45 degree, ioT_temp 1 votes 30 degree, agreement on anomaly = false", async function () {
             // before vote
             seq = await custodian.newly_opened_seq();
             assert.equal(await custodian.campHasFinished(seq), false);
 
             // vote
-            await ioT_press[0].vote(false); 
-            await ioT_temp[0].vote(true); 
-            await ioT_temp[1].vote(false); 
+            await ioT_press[0].logPressure(50); 
+            await ioT_temp[0].logTemperature(45); 
+            await ioT_temp[1].logTemperature(30); 
             
             // 4 voters in total now
             totalVoters = await custodian.numOfTotalVoterClients();  
