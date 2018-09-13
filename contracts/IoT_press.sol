@@ -7,25 +7,22 @@ contract IoT_press is Client {
 
     event lowerPressure();
 
-    constructor(address _custodianAddr) Client(_custodianAddr) public {
-        
-    }
-
     // Measurement
-    function logPressure(uint _pressure) public {
+    // log for what consensus(_custodianAddr)
+    function logPressure(address _custodianAddr, uint _pressure) public {
 
         // vote true for abnormal case
         if(_pressure > 100) {
-            vote(true); 
+            vote(_custodianAddr, true); 
         } 
         else{
-            vote(false);
+            vote(_custodianAddr, false);
         }
     }
 
     // Action
-    function adjustPressure() public {
-        isAbnormal = queryFinalState();
+    function adjustPressure(address _custodianAddr) public {
+        isAbnormal = queryFinalState(_custodianAddr);
         if(isAbnormal == 1){ // if isAbnormal = true
             emit lowerPressure();
         }

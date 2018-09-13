@@ -7,25 +7,21 @@ contract IoT_temp is Client {
 
     event CoolDown();
 
-    constructor(address _custodianAddr) Client(_custodianAddr) public {
-        
-    }
-
     // Measurement
-    function logTemperature(uint _temperature) public {
+    function logTemperature(address _custodianAddr, uint _temperature) public {
 
         // vote true for abnormal case
         if(_temperature > 40) {
-            vote(true); 
+            vote(_custodianAddr, true); 
         } 
         else{
-            vote(false);
+            vote(_custodianAddr, false);
         }
     }
 
     // Action
-    function adjustTemp() public {
-        isAbnormal = queryFinalState();
+    function adjustTemp(address _custodianAddr) public {
+        isAbnormal = queryFinalState(_custodianAddr);
         if(isAbnormal == 1){ // if isAbnormal = true
             emit CoolDown();
         }
