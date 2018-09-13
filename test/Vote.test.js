@@ -1,5 +1,4 @@
 const { assertRevert } = require("./helper/assertRevert");
-const { soliditySha3 } = require('web3-utils');
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
 const IoT_temp = artifacts.require("IoT_temp");
