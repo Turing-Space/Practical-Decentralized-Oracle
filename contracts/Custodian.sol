@@ -1,11 +1,9 @@
 pragma solidity ^0.4.24;
 
-import "./Ownable.sol";
-
-contract Custodian is Ownable {
+contract Custodian {
     
     uint8 public THRESHOLD_OF_PARTICIPANTS = 60;
-    
+
     uint256 public numOfTotalVoterClients;
     bytes32 public newly_opened_seq;    
     bytes32 public last_finalized_seq;    
@@ -22,6 +20,7 @@ contract Custodian is Ownable {
     function acceptVote(bytes32 _seq, bool _value) public  {
         
         address client = msg.sender;
+        // TODO: check if msg.sender is really a client
                 
         // Each client has single vote on a Seq
         if (clientHasVotedOnSeq[client][_seq]) revert("Each client can only vote once");
