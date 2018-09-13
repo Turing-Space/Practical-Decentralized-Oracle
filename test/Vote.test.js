@@ -144,10 +144,7 @@ contract('Custodian', function (accounts) {
     context('Four participants, four voters', function () {
 
         it("check voting camp for new seq hasn't finished", async function(){
-            // record seq before vote
             seq = await custodian.newly_opened_seq();
-
-            // camp hasn't finished
             assert.equal(await custodian.campHasFinished(seq), false);
         });
 
