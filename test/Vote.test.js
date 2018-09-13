@@ -160,7 +160,6 @@ contract('Custodian', function (accounts) {
         });
 
         it("client 0 vote true", async function(){
-            // client 0 vote for true
             await client[0].vote(false); 
         });
 
