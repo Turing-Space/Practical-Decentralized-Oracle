@@ -165,7 +165,7 @@ contract('Custodian', function (accounts) {
         });
 
         it("client 1 vote true", async function(){
-            // client 0 vote for true
+            // client 1 vote for true
             await client[1].vote(true); 
         });
 
