@@ -38,8 +38,57 @@ contract('Custodian', function (accounts) {
             }
         });
 
-        // it("Ratio=0.5", async function () {
-        //     var RATIO = 0.5;
+        it("Ratio=0.5", async function () {
+            var RATIO = 0.5;
+            // Start the timer
+            start_ts = getNow();
+            // Start watching events
+            var events = custodian.allEvents([""]);
+
+            events.watch(function(error, event){
+                if (!error) {
+                    console.log("Event:", event.args.finalResult.toNumber());
+                    // Get the timer counts
+                    time_diff = getTimeDiff(start_ts);
+                    console.log("Time Difference: ", time_diff);   
+                } else { console.log(error); }
+            });
+
+            // Start voting
+            for (var i = 0; i < N; i++) {
+                clients[i].vote(consensus["Test"], randBoolPos(RATIO));
+            }
+
+            // myEvent.stopWatching()
+        });
+
+
+        it("Ratio=1", async function () {
+            var RATIO = 1;
+            // Start the timer
+            start_ts = getNow();
+            // Start watching events
+            // var events = custodian.allEvents(["latest"]);
+
+            var events = custodian.allEvents([""]);
+
+            events.watch(function(error, event){
+                if (!error) {
+                    console.log("Event:", event.args.finalResult.toNumber());
+                    // Get the timer counts
+                    time_diff = getTimeDiff(start_ts);
+                    console.log("Time Difference: ", time_diff);   
+                } else { console.log(error); }
+            });
+
+            // Start voting
+            for (var i = 0; i < N; i++) {
+                clients[i].vote(consensus["Test"], randBoolPos(RATIO));
+            }
+        });
+
+        // it("Ratio=1", async function () {
+        //     var RATIO = 1;
         //     // Start the timer
         //     start_ts = getNow();
         //     // Start watching events
@@ -48,7 +97,7 @@ contract('Custodian', function (accounts) {
         //             console.log("Event:", event.args.finalResult.toNumber());
         //             // Get the timer counts
         //             time_diff = getTimeDiff(start_ts);
-        //             console.log("Time Difference: ", time_diff);   
+        //             console.log("Time Difference: ", time_diff);                    
         //         } else { console.log(error); }
         //     });
 
@@ -57,26 +106,6 @@ contract('Custodian', function (accounts) {
         //         clients[i].vote(consensus["Test"], randBoolPos(RATIO));
         //     }
         // });
-
-        it("Ratio=1", async function () {
-            var RATIO = 1;
-            // Start the timer
-            // start_ts = getNow();
-            // // Start watching events
-            // var events = custodian.allEvents(["latest"], function(error, event){
-            //     if (!error) {
-            //         console.log("Event:", event.args.finalResult.toNumber());
-            //         // Get the timer counts
-            //         time_diff = getTimeDiff(start_ts);
-            //         console.log("Time Difference: ", time_diff);                    
-            //     } else { console.log(error); }
-            // });
-
-            // Start voting
-            for (var i = 0; i < N; i++) {
-                clients[i].vote(consensus["Test"], randBoolPos(RATIO));
-            }
-        });
 
         // it("Ratio=0", async function () {
         //     var RATIO = 0;

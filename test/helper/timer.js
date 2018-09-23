@@ -7,6 +7,4 @@ function getTimeDiff(startTime) {
     return diff;
 }
 
-module.exports ={
-    getNow, getTimeDiff,
-  }
+module.exports = { getNow, getTimeDiff }
