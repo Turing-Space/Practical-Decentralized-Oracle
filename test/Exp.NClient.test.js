@@ -51,6 +51,7 @@ contract('Custodian', function (accounts) {
                     // Get the timer counts
                     time_diff = getTimeDiff(start_ts);
                     console.log("Time Difference: ", time_diff);   
+                    // events.stopWatching();
                 } else { console.log(error); }
             });
 
@@ -60,6 +61,9 @@ contract('Custodian', function (accounts) {
             }
 
             // myEvent.stopWatching()
+            var myResults = events.get(function(error, logs){
+                console.log(logs);
+            });
         });
 
 
@@ -85,6 +89,11 @@ contract('Custodian', function (accounts) {
             for (var i = 0; i < N; i++) {
                 clients[i].vote(consensus["Test"], randBoolPos(RATIO));
             }
+
+            // myEvent.stopWatching()
+            var myResults = events.get(function(error, logs){
+                console.log(logs);
+            });
         });
 
         // it("Ratio=1", async function () {
