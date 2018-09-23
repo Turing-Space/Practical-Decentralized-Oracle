@@ -21,4 +21,4 @@ contract Client is IClient {
     function _syncToNewlyOpenedSeq(address _custodianAddr) private {
         seq = ICustodian(_custodianAddr).newly_opened_seq();
     }
-}
+}   

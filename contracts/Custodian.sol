@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
-contract Custodian {
+import "./ICustodian.sol";
+
+contract Custodian is ICustodian {
     
     uint8 public THRESHOLD_OF_PARTICIPANTS = 60;
 
