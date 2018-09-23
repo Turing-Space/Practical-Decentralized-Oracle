@@ -16,7 +16,8 @@ let ioT_press = [];
 let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 let consensus = {};
 let N = 0;          // The total number of voters (can be updated according to Exp)
-let start_ts;       
+let start_ts; 
+let events;      
 
 function randBoolPos(pos_ratio){ return (Math.random() < pos_ratio); }
 
@@ -27,6 +28,7 @@ contract('Custodian', function (accounts) {
         it("decide which consensus to be voted on and deploy a custodian contract for this", async function(){
             custodian = await Custodian.new();
             consensus["Test"] = custodian.address;
+            events = custodian.allEvents(["latest"]);
         });
 
         it("should deploy one new client contract", async function () {
@@ -43,11 +45,9 @@ contract('Custodian', function (accounts) {
             // Start the timer
             start_ts = getNow();
             // Start watching events
-            var events = custodian.allEvents([""]);
-
             events.watch(function(error, event){
                 if (!error) {
-                    console.log("Event:", event.args.finalResult.toNumber());
+                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber());
                     // Get the timer counts
                     time_diff = getTimeDiff(start_ts);
                     console.log("Time Difference: ", time_diff);   
@@ -59,11 +59,6 @@ contract('Custodian', function (accounts) {
             for (var i = 0; i < N; i++) {
                 clients[i].vote(consensus["Test"], randBoolPos(RATIO));
             }
-
-            // myEvent.stopWatching()
-            var myResults = events.get(function(error, logs){
-                console.log(logs);
-            });
         });
 
 
@@ -74,26 +69,23 @@ contract('Custodian', function (accounts) {
             // Start watching events
             // var events = custodian.allEvents(["latest"]);
 
-            var events = custodian.allEvents([""]);
+            // var events = custodian.allEvents([""]);
 
-            events.watch(function(error, event){
-                if (!error) {
-                    console.log("Event:", event.args.finalResult.toNumber());
-                    // Get the timer counts
-                    time_diff = getTimeDiff(start_ts);
-                    console.log("Time Difference: ", time_diff);   
-                } else { console.log(error); }
-            });
+            // events.watch(function(error, event){
+            //     if (!error) {
+            //         console.log("Event", event.event, event.args.seq, ":", event.args.finalResult.toNumber());
+            //         // Get the timer counts
+            //         time_diff = getTimeDiff(start_ts);
+            //         console.log("Time Difference: ", time_diff);   
+            //     } else { console.log(error); }
+            // });
 
             // Start voting
             for (var i = 0; i < N; i++) {
                 clients[i].vote(consensus["Test"], randBoolPos(RATIO));
             }
 
-            // myEvent.stopWatching()
-            var myResults = events.get(function(error, logs){
-                console.log(logs);
-            });
+            events.get(function(error, logs){ console.log(logs) });
         });
 
         // it("Ratio=1", async function () {
