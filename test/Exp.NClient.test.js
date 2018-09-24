@@ -31,7 +31,7 @@ function sleep(ms) {
 
 contract('Custodian', function (accounts) {
 
-    context('N=10 voters', function () {
+    context('N voters', function () {
 
         let N = 50;
 

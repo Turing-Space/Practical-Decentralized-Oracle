@@ -10,7 +10,7 @@
     - N (total number of voters): 1, 5, 10, 20, 50, 100, 200, 500, 1000
         - study whether the latency will increase exponentially or linearly as N grows
     - Consensus: 1, 5, 10, 20, 50, 100, 200, 500, 1000
-        - fixed N, multiple consensus to reach (eg. "consensus1", "consensus2")  
+        - fixed N, multiple consensus to reach (eg. "consensus1", "consensus2")
         - test the scale of the concurrency
         - each voting action is atmoic 
     - Thresh (Binary): 10, 20, ..., 90, 100

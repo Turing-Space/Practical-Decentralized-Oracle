@@ -40,6 +40,9 @@ module.exports = {
       network_id: 44,
       gas: 7990000,
     },
-  }
+  },
+  // mocha: {
+  //   enableTimeouts: false
+  // }
 
 };
