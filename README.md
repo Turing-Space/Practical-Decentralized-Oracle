@@ -7,13 +7,15 @@
 
 ## Experiements (platform: Kovan PoA)
 1. Agreement reaching latency (ms): a client from voted to FIRST camp finalized with the same seq id 
-    - N (total number of voters): 1, 5, 10, 20, 50, 100, 200, 500, 1000
+    - N (total number of voters): 10, 20, 30, ... 100
+        - fixed M 1
         - study whether the latency will increase exponentially or linearly as N grows
-    - Consensus: 1, 5, 10, 20, 50, 100, 200, 500, 1000
-        - fixed N, multiple consensus to reach (eg. "consensus1", "consensus2")
+    - Consensus: 10, 20, 30, ... 100
+        - fixed N 100, multiple consensus to reach (eg. "consensus1", "consensus2")
         - test the scale of the concurrency
         - each voting action is atmoic 
     - Thresh (Binary): 10, 20, ..., 90, 100
+        - fixed N 100, M 1
         - configurable according to network stability
     - Thresh (Multi-valued): 
         - dim1: parti thresh: 10, 20, ..., 90, 100
