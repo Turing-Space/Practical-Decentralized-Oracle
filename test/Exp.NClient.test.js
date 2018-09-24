@@ -16,10 +16,17 @@ let ioT_press = [];
 let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 let consensus = {};
 let N = 0;          // The total number of voters (can be updated according to Exp)
-let start_ts; 
-let events;      
+let events;
+
+let t1; 
+let t2;
+let ans = [];
 
 function randBoolPos(pos_ratio){ return (Math.random() < pos_ratio); }
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
 contract('Custodian', function (accounts) {
 
@@ -28,37 +35,53 @@ contract('Custodian', function (accounts) {
         let N = 10;
 
         it("decide which consensus to be voted on and deploy a custodian contract for this", async function(){
+            // Create custodian
             custodian = await Custodian.new();
             consensus["Test"] = custodian.address;
+
+            // Create event
             events = custodian.allEvents(["latest"]);
+
+            // Watch event
             events.watch(function(error, event){
                 if (!error) {
-                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber());
-                    console.log("End Time: ", getNow());   
+                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber(), "End Time: ", getNow());
                 } else { console.log(error); }
             });
         });
 
         it("should deploy one new client contract", async function () {
+            // Extend the voter base to N
             for (var i = 0; i < N; i++) {
                 clients[i] = await Client.new();
-                // Extend the voter base to N
                 console.log("voter", i+1, "joins at", getNow());
-                await clients[i].vote(consensus["Test"], false);
+                await clients[i].vote(consensus["Test"], true);
             }
+
+            // Termination
+            await custodian.unsafeTerminateCurrentOpenedSeq();
+            console.log(" ========== Everything starts from here :) ========== ");
         });
 
-        it("should deploy one new client contract", async function () {
-            events.watch(function(error, event){
-                if (!error) {
-                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber());
-                    // Get the timer counts
-                    time_diff = getTimeDiff(start_ts);
-                    console.log("Time Difference: ", time_diff);   
-                    // events.stopWatching();
-                } else { console.log(error); }
-            });
+        it("let's vote", async function () {
+            // Extend the voter base to N
+            for (var i = 0; i < N; i++) {
+                // clients[i] = await Client.new();
+                // console.log("voter", i+1, "joins at", getNow());
+                clients[i].vote(consensus["Test"], false);
+            }
+
+            // await setTimeout(function() {console.log("wait for 10 seconds")}, 100000);
+            console.log(await custodian.numOfTotalVoterClients());
+            
+
+            await sleep(8000);
+            // Termination
+            // await custodian.unsafeTerminateCurrentOpenedSeq();
+            // console.log(" ========== Everything starts from here :) ========== ");
         });
+
+
 
     });
 

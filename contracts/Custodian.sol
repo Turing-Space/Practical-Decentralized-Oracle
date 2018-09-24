@@ -18,6 +18,21 @@ contract Custodian is ICustodian {
     mapping (bytes32 => bool) public campHasFinished;
 
     event VoteCampFinished(bytes32 seq, uint8 finalResult);
+
+    // Warning: This function is only for experiments
+    function unsafeSetVoterBase(uint256 _val) public { numOfTotalVoterClients = _val; }
+
+    // Warning: This function is only for experiments
+    function unsafeTerminateCurrentOpenedSeq() public {
+        bytes32 _seq = newly_opened_seq;
+        finalResultOnCamp[_seq] = 0;
+
+        campHasFinished[_seq] = true;
+        last_finalized_seq = _seq;
+        newly_opened_seq = keccak256(abi.encodePacked(_seq));
+        
+        emit VoteCampFinished(_seq, finalResultOnCamp[_seq]);
+    }
     
     function acceptVote(bytes32 _seq, bool _value) public  {
         
