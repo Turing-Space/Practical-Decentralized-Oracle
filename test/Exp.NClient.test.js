@@ -20,6 +20,7 @@ let events;
 
 let t1; 
 let t2;
+let hasAllVoted = false;
 let ans = [];
 
 function randBoolPos(pos_ratio){ return (Math.random() < pos_ratio); }
@@ -32,7 +33,7 @@ contract('Custodian', function (accounts) {
 
     context('N=10 voters', function () {
 
-        let N = 10;
+        let N = 50;
 
         it("decide which consensus to be voted on and deploy a custodian contract for this", async function(){
             // Create custodian
@@ -46,6 +47,12 @@ contract('Custodian', function (accounts) {
             events.watch(function(error, event){
                 if (!error) {
                     console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber(), "End Time: ", getNow());
+                    
+                    // Catch t2
+                    if (hasAllVoted) { 
+                        t2 = getNow(); 
+                        console.log("Answer:", t2 - t1);
+                    }
                 } else { console.log(error); }
             });
         });
@@ -55,33 +62,27 @@ contract('Custodian', function (accounts) {
             for (var i = 0; i < N; i++) {
                 clients[i] = await Client.new();
                 console.log("voter", i+1, "joins at", getNow());
-                await clients[i].vote(consensus["Test"], true);
+                await clients[i].vote(consensus["Test"], true);  // HAS AWAIT
             }
 
             // Termination
             await custodian.unsafeTerminateCurrentOpenedSeq();
             console.log(" ========== Everything starts from here :) ========== ");
+            await sleep(500);
         });
 
         it("let's vote", async function () {
-            // Extend the voter base to N
-            for (var i = 0; i < N; i++) {
-                // clients[i] = await Client.new();
-                // console.log("voter", i+1, "joins at", getNow());
-                clients[i].vote(consensus["Test"], false);
-            }
+            // Catch t1
+            t1 = getNow();
+            hasAllVoted = true;
 
-            // await setTimeout(function() {console.log("wait for 10 seconds")}, 100000);
-            console.log(await custodian.numOfTotalVoterClients());
-            
-
-            await sleep(8000);
-            // Termination
-            // await custodian.unsafeTerminateCurrentOpenedSeq();
-            // console.log(" ========== Everything starts from here :) ========== ");
+            // Extend the voter base to N (NO AWAIT)
+            for (var i = 0; i < N; i++) { clients[i].vote(consensus["Test"], false); }
         });
 
-
+        it("let's sleep", async function () {
+            await sleep(500);
+        });
 
     });
 
