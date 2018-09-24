@@ -42,7 +42,7 @@ contract('Custodian', function (accounts) {
             for (var m = 0; m<M; m++){
                 consensus[m] = await Custodian.new();
 
-                // All clients vote for custodian m
+                // extend voter base to N
                 for (var n = 0; n<N; n++){
                     await clients[n].vote(consensus[m].address, true);  // HAS AWAIT
                 }
@@ -85,7 +85,7 @@ contract('Custodian', function (accounts) {
                     // terminate all camps for each consensus before start another vote camp
                     await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
-                    // Extend the voter base to N (NO AWAIT)
+                    // all clients vote (NO AWAIT)
                     for (var i = 0; i < N; i++) { clients[i].vote(consensus[0].address, false); }
                 
                     await sleep(3000);
