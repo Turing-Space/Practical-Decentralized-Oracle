@@ -16,6 +16,7 @@
     "web3-utils": "^1.0.0-beta.36"
   },
   "dependencies": {
-    "chai": "^4.1.2"
+    "chai": "^4.1.2",
+    "truffle-hdwallet-provider": "0.0.6"
   }
 }

@@ -29,8 +29,12 @@ contract('Custodian', function (accounts) {
             custodian = await Custodian.new();
             consensus["Test"] = custodian.address;
             events = custodian.allEvents(["latest"]);
-
-            
+            events.watch(function(error, event){
+                if (!error) {
+                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber());
+                    console.log("End Time: ", getNow());   
+                } else { console.log(error); }
+            });
         });
 
         it("should deploy one new client contract", async function () {
@@ -38,20 +42,9 @@ contract('Custodian', function (accounts) {
             for (var i = 0; i < N; i++) {
                 clients[i] = await Client.new();
                 // Extend the voter base to N
+                console.log("voter", i+1, "joins at", getNow());
                 await clients[i].vote(consensus["Test"], false);
             }
-        });
-
-        it("should deploy one new client contract", async function () {
-            events.watch(function(error, event){
-                if (!error) {
-                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber());
-                    // Get the timer counts
-                    time_diff = getTimeDiff(start_ts);
-                    console.log("Time Difference: ", time_diff);   
-                    // events.stopWatching();
-                } else { console.log(error); }
-            });
         });
 
         // it("Ratio=0.5", async function () {
