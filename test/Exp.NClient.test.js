@@ -25,6 +25,8 @@ contract('Custodian', function (accounts) {
 
     context('N=10 voters', function () {
 
+        let N = 10;
+
         it("decide which consensus to be voted on and deploy a custodian contract for this", async function(){
             custodian = await Custodian.new();
             consensus["Test"] = custodian.address;
@@ -38,7 +40,6 @@ contract('Custodian', function (accounts) {
         });
 
         it("should deploy one new client contract", async function () {
-            N = 10;
             for (var i = 0; i < N; i++) {
                 clients[i] = await Client.new();
                 // Extend the voter base to N
@@ -47,64 +48,17 @@ contract('Custodian', function (accounts) {
             }
         });
 
-        // it("Ratio=0.5", async function () {
-        //     var RATIO = 0.5;
-
-        //     // Start voting
-        //     for (var i = 0; i < N; i++) {
-        //         await clients[i].vote(consensus["Test"], randBoolPos(RATIO));
-        //     }
-        // });
-
-
-        // it("Ratio=1", async function () {
-        //     var RATIO = 0.2;
-
-        //     // Start voting
-        //     for (var i = 0; i < N; i++) {
-        //         await clients[i].vote(consensus["Test"], randBoolPos(RATIO));
-        //     }
-        // });
-
-        // it("Ratio=1", async function () {
-        //     var RATIO = 1;
-        //     // Start the timer
-        //     start_ts = getNow();
-        //     // Start watching events
-        //     var events = custodian.allEvents(["latest"], function(error, event){
-        //         if (!error) {
-        //             console.log("Event:", event.args.finalResult.toNumber());
-        //             // Get the timer counts
-        //             time_diff = getTimeDiff(start_ts);
-        //             console.log("Time Difference: ", time_diff);                    
-        //         } else { console.log(error); }
-        //     });
-
-        //     // Start voting
-        //     for (var i = 0; i < N; i++) {
-        //         clients[i].vote(consensus["Test"], randBoolPos(RATIO));
-        //     }
-        // });
-
-        // it("Ratio=0", async function () {
-        //     var RATIO = 0;
-        //     // Start the timer
-        //     start_ts = getNow();
-        //     // Start watching events
-        //     var events = custodian.allEvents(["latest"], function(error, event){
-        //         if (!error) {
-        //             console.log("Event:", event.args.finalResult.toNumber());
-        //             // Get the timer counts
-        //             time_diff = getTimeDiff(start_ts);
-        //             console.log("Time Difference: ", time_diff);   
-        //         } else { console.log(error); }
-        //     });
-
-        //     // Start voting
-        //     for (var i = 0; i < N; i++) {
-        //         clients[i].vote(consensus["Test"], randBoolPos(RATIO));
-        //     }
-        // });
+        it("should deploy one new client contract", async function () {
+            events.watch(function(error, event){
+                if (!error) {
+                    console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber());
+                    // Get the timer counts
+                    time_diff = getTimeDiff(start_ts);
+                    console.log("Time Difference: ", time_diff);   
+                    // events.stopWatching();
+                } else { console.log(error); }
+            });
+        });
 
     });
 
