@@ -19,22 +19,17 @@ let ioT_temp = [];
 let ioT_press = [];
 let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 let consensus = {};
-let N = 0;          // The total number of voters (can be updated according to Exp)
 let events;
 
-let t1; 
-let t2;
-let hasAllVoted = false;
-let ans = [];
+let t1 = []; 
+let t2 = [];
+let max_trial = 20;
+let N = 10;    // fixed N clients
+let M = 20;    // max custodians
 
 contract('Custodian', function (accounts) {
     context('N voters', function () {
         it("Exp", async function(){
-
-            let max_trial = 20;
-
-            let N = 10;    // fixed N clients
-            let M = 20;    // max custodians
 
             // Create client
             clients = [];
@@ -46,8 +41,7 @@ contract('Custodian', function (accounts) {
 
             // Create custodian
             for (var m = 0; m<M; m++){
-                custodian = await Custodian.new();
-                consensus[m] = custodian;
+                consensus[m] = await Custodian.new();
 
                 // All clients vote for custodian m
                 for (var n = 0; n<N; n++){
@@ -55,56 +49,51 @@ contract('Custodian', function (accounts) {
                 }
 
                 // Terminate custodian m
-                await custodian.unsafeTerminateCurrentOpenedSeq();
+                await consensus[m].unsafeTerminateCurrentOpenedSeq();
             }
 
             console.log("All Custodians deployed");            
 
-            // Termination of client creation
+            // Termination of creation
             await sleep(800);
 
 
-            // Test different numbers of Consensus
+            // Test different number of Consensus
             for (var m = 10; m<=M; m+=10) {
 
                 let ans_array_per_m = [];
 
                 // Do multiple trials
-                for (var j = 0; j<max_trial;j++){
-
-                    // Single custodian
+                for (var j = 0; j<max_trial; j++){
 
                     // start!
-                    t1 = getNow();
+                    t1[m] = await getNow();
 
                     for (var c = 0; c<m; c++) {
 
-                        custodian = consensus[c];
-
                         // Event
-                        events = custodian.allEvents(["latest"]);
+                        events = consensus[c].allEvents(["latest"]);
                         events.watch(async function(error, event){
                             if (!error) {
-                                t2 = getNow(); 
-                                await custodian.unsafeTerminateCurrentOpenedSeq();
+                                t2[m] = await getNow(); 
                             } else { console.log(error); }
                         });
 
+                        // terminate all camps for each consensus before start another vote camp
+                        await consensus[c].unsafeTerminateCurrentOpenedSeq();
 
                         // Extend the voter base to N (NO AWAIT)
-                        for (var i = 0; i < N; i++) { clients[i].vote(custodian.address, false); }
-                        
-                        await sleep(800);
+                        for (var i = 0; i < N; i++) { clients[i].vote(consensus[c].address, false); }
                     }
-                    
 
+                    // sleep before catch t2
+                    await sleep(5000);
+                    
                     // Catch t2
-                    cur_ans = t2 - t1;
-                    console.log(m, ":", cur_ans);
+                    cur_ans = t2[m] - t1[m];
+                    console.log(m, ":", t2[m], t1[m], cur_ans);
                     ans_array_per_m.push(cur_ans);
                 }
-
-                console.log("hi");
 
                 // Output to file (m:time)
                 writeToFile("Exp2-"+m.toString(), ans_array_per_m);
