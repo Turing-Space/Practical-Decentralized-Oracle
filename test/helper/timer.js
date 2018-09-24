@@ -1,5 +1,7 @@
 function getNow() {
-    return new Date().getTime(); // Return sth that uses 0.001 second as unit
+    return new Promise(function(resolve) {
+          resolve(new Date().getTime());
+      });
 }
 
 function getTimeDiff(startTime) {
