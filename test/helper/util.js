@@ -1,3 +1,4 @@
+var fs = require("fs");
 function randBoolPos(pos_ratio){ return (Math.random() < pos_ratio); }
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 

@@ -7,9 +7,6 @@ const Client = artifacts.require("Client");
 const IoT_temp = artifacts.require("IoT_temp");
 const IoT_press = artifacts.require("IoT_press");
 
-var _ = require('lodash');
-var fs = require('fs');
-
 let clients = []; // array of client contracts 
 // let clientIdToPolarity = {};
 let seq;
@@ -25,7 +22,10 @@ let t1 = [];
 let t2 = [];
 let max_trial = 20;
 let N = 100;    // fixed N clients
-let M = 100;    // max custodians
+let M = 1;    // max custodians
+let T = 100;
+
+let timerOn = false;
 
 contract('Custodian', function (accounts) {
     context('N voters', function () {
@@ -55,45 +55,47 @@ contract('Custodian', function (accounts) {
             // Termination of creation
             await sleep(800);
 
-            // Test different number of Consensus
-            for (var m = 10; m<=M; m+=10) {
+            // Test different number of Threshold
+            for (var t = 10; t<=T; t+=10) {
 
-                let ans_array_per_m = [];
+                let ans_array_per_t = [];
+                await consensus[0].unsafeSetThreshold(t);
+                assert.equal(await consensus[0].THRESHOLD_OF_PARTICIPANTS(), t);
 
                 // Do multiple trials
                 for (var j = 0; j<max_trial; j++){
 
                     // start!
-                    t1[m] = await getNow();
+                    t1[t] = await getNow();
+                    timerOn = true;
 
-                    for (var c = 0; c<m; c++) {
+                    // Event
+                    events = consensus[0].allEvents(["latest"]);
+                    events.watch(async function(error, event){
+                        if (!error) {
 
-                        // Event
-                        events = consensus[c].allEvents(["latest"]);
-                        events.watch(async function(error, event){
-                            if (!error) {
-                                t2[m] = await getNow(); 
-                            } else { console.log(error); }
-                        });
+                            if (timerOn) {
+                                t2[t] = await getNow(); 
+                                timerOn = false;
+                            }
 
-                        // terminate all camps for each consensus before start another vote camp
-                        await consensus[c].unsafeTerminateCurrentOpenedSeq();
+                        } else { console.log(error); }
+                    });
 
-                        // Extend the voter base to N (NO AWAIT)
-                        for (var i = 0; i < N; i++) { clients[i].vote(consensus[c].address, false); }
-                    }
+                    // terminate all camps for each consensus before start another vote camp
+                    await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
-                    // sleep before catch t2
-                    await sleep(5000);
-                    
-                    // Catch t2
-                    cur_ans = t2[m] - t1[m];
-                    console.log(m, ":", t2[m], t1[m], cur_ans);
-                    ans_array_per_m.push(cur_ans);
+                    // Extend the voter base to N (NO AWAIT)
+                    for (var i = 0; i < N; i++) { clients[i].vote(consensus[0].address, false); }
+                
+                    await sleep(3000);
+
+                    cur_ans = t2[t] - t1[t];
+                    console.log(t, ":", t2[t], t1[t], cur_ans);
+                    ans_array_per_t.push(cur_ans);
                 }
-
                 // Output to file (m:time)
-                writeToFile("Exp2-"+m.toString(), ans_array_per_m);
+                writeToFile("Exp3-"+t.toString(), ans_array_per_t);
             }
         }).timeout(3000000000);
     });

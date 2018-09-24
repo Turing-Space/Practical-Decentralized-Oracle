@@ -25,6 +25,11 @@ module.exports = {
       port: 8545,
       network_id: "*" // Match any network id
     },
+    net9001: {
+      host: "localhost",
+      port: 9001,
+      network_id: "*" // Match any network id
+    },
     ropsten: {
       provider: function () {
         return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/lMgQfS5DDh31T0z6iD5E")

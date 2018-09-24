@@ -33,6 +33,9 @@ contract Custodian is ICustodian {
         
         emit VoteCampFinished(_seq, finalResultOnCamp[_seq]);
     }
+
+    // Warning: This function is only for experiments
+    function unsafeSetThreshold(uint8 _thresh) public { THRESHOLD_OF_PARTICIPANTS = _thresh; }
     
     function acceptVote(bytes32 _seq, bool _value) public  {
         
