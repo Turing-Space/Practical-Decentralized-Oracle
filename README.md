@@ -6,7 +6,7 @@
 `truffle test test/Exp.NClient.test.js --network kovan`
 
 ## Experiements (platform: Kovan PoA)
-1. Agreement reaching latency (ms): a client from voted to camp finalized with the same seq id 
+1. Agreement reaching latency (ms): a client from vote issuance to camp finalized with the same seq id 
     - N (total number of voters): 1, 5, 10, 20, 50, 100, 200, 500, 1000
         - study whether the latency will increase exponentially or linearly as N grows
     - Consensus: 1, 5, 10, 20, 50, 100, 200, 500, 1000
