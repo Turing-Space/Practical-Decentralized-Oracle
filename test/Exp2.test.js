@@ -96,7 +96,7 @@ contract('Custodian', function (accounts) {
                 }
 
                 // Output to file (m:time)
-                // writeToFile("Exp2-"+m.toString(), ans_array_per_m);
+                writeToFile("Exp2-"+m.toString(), ans_array_per_m);
             }
         }).timeout(3000000000);
 
