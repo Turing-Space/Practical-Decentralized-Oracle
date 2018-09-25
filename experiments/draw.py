@@ -5,14 +5,20 @@ import matplotlib.pyplot as plt
 def getAve(arr):
     return sum([int(x) for x in arr]) / len(arr)
 
-ans = []
+def getListOfFiles(re):
+    return sorted(glob.glob(re))
 
-list_of_files = sorted(glob.glob('./Exp3*.csv'))
-for file_name in list_of_files:
+### Global Variables
+ans = []
+fileRE = './Exp3*.csv'
+
+
+### Main Execution
+for file_name in getListOfFiles(fileRE):
     with open(file_name, newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
         for row in spamreader:
-            print(row)
+            print(file_name, row)
             # res = getAve(row[1:])
             res = getAve(row)
             
