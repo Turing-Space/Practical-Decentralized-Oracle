@@ -17,6 +17,9 @@ let max_trial = 20;
 let N = 100;    // fixed N clients
 let M = 1;    // max custodians
 let T = 100;
+let STEP = 5; 
+let START_NUM = 5;
+let EXP_NUM = "Exp3";
 
 let timerOn = false;
 
@@ -52,7 +55,7 @@ contract('Custodian', function (accounts) {
             await sleep(800);
 
             // Test different number of Threshold
-            for (var t = 10; t<=T; t+=10) {
+            for (var t = START_NUM; t<=T; t+=STEP) {
 
                 let ans_array_per_t = [];
                 await consensus[0].unsafeSetThreshold(t);
@@ -91,7 +94,7 @@ contract('Custodian', function (accounts) {
                     ans_array_per_t.push(cur_ans);
                 }
                 // Output to file (m:time)
-                writeToFile("Exp3-"+prefix+"-"+t.toString(), ans_array_per_t);
+                writeToFile(EXP_NUM+"-"+prefix+"-"+t.toString(), ans_array_per_t);
             }
         }).timeout(3000000000);
     });
