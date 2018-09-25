@@ -1,6 +1,5 @@
 const { getNow } = require("./helper/timer");
 const { sleep, writeToFile, readCsvIntoAddresses } = require("./helper/util");
-const csv=require('csvtojson');
 const fs=require('fs');
 
 const Custodian = artifacts.require("Custodian");
