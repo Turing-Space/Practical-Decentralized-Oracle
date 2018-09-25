@@ -10,7 +10,7 @@ for(var i=0;i<obj.length;i++){
         contract_addr.push(obj[i].contractAddress);
         cnt++;
     }
-    if(cnt>=101) break;
+    if(cnt>=100) break;
 }
 console.log("address obtained:", cnt);
 writeToFile("client_addr", contract_addr);
