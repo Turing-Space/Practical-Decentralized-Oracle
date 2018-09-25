@@ -91,7 +91,7 @@ contract('Custodian', function (accounts) {
                     ans_array_per_t.push(cur_ans);
                 }
                 // Output to file (m:time)
-                writeToFile("Exp1-"+prefix+"-"+n.toString(), ans_array_per_t);
+                writeToFile("Exp3-"+prefix+"-"+t.toString(), ans_array_per_t);
             }
         }).timeout(3000000000);
     });

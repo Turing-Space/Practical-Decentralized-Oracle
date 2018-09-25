@@ -18,8 +18,8 @@ def getFirstRowOfCsv(file_name):
 ### Global Variables
 ans = []
 # fileRE = './Exp3-*.csv'
-fileRE = './Exp1-ganache-*.csv'
-preChar = 15
+fileRE = './Exp1-aws-ganache-done/Exp1-aws2-*.csv'
+preChar = 26 + 13 - 5
 postChar = 4
 
 ### Main Execution
