@@ -29,8 +29,8 @@ contract('Custodian', function (accounts) {
             // Create client
             clients = [];
 
-            // Load all Client addresses
-            var addresses = await readCsvIntoAddresses('test/client_addr.csv');
+            // Load all Client addresses on Kovan
+            var addresses = await readCsvIntoAddresses('experiments/client_addr.csv');
             console.log(addresses);
             console.log(addresses.length,"clients found");
 
