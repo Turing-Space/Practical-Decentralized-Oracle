@@ -15,7 +15,8 @@ let events;
 let t1 = []; 
 let t2 = [];
 let max_trial = 20;                 // was 20
-let N = 100;    // fixed N clients  // was 100
+// let N = 100;    // fixed N clients  // was 100
+let N = 300;    // fixed N clients  // was 100
 let M = 1;    // max custodians
 let T = 100;                        // was 100
 
