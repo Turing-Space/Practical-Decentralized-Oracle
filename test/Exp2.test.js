@@ -1,23 +1,10 @@
-const { assertRevert } = require("./helper/assertRevert");
-const { getNow, getTimeDiff } = require("./helper/timer");
-const { randBoolPos, sleep, writeToFile } = require("./helper/util");
+const { getNow } = require("./helper/timer");
+const { sleep, writeToFile } = require("./helper/util");
 
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
-const IoT_temp = artifacts.require("IoT_temp");
-const IoT_press = artifacts.require("IoT_press");
-
-var _ = require('lodash');
-var fs = require('fs');
 
 let clients = []; // array of client contracts 
-// let clientIdToPolarity = {};
-let seq;
-let result;
-let totalVoters;
-let ioT_temp = [];
-let ioT_press = [];
-let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 let consensus = {};
 let events;
 
