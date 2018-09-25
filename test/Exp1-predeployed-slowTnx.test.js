@@ -87,7 +87,10 @@ contract('Custodian', function (accounts) {
                     await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
                     // all client votes
-                    for (var i = 0; i < n; i++) { clients[i].vote(consensus[0].address, false); }
+                    for (var i = 0; i < n; i++) { 
+                        clients[i].vote(consensus[0].address, false); 
+                        await sleep(100);
+                    }
                 
                     await sleep(3000);
                     assert.equal(await consensus[0].numOfTotalVoterClients(), n);
@@ -97,8 +100,8 @@ contract('Custodian', function (accounts) {
                     ans_array_per_n.push(cur_ans);
                 }
                 // Output to file (m:time)
-                writeToFile("Exp4-"+n.toString(), ans_array_per_n);
+                writeToFile("Exp1-"+n.toString(), ans_array_per_n);
             }
-        }).timeout(3000000000);
+        }).timeout(999999999999);
     });
 });
