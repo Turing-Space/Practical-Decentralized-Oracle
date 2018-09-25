@@ -14,10 +14,10 @@ let events;
 
 let t1 = []; 
 let t2 = [];
-let max_trial = 1;                 // was 20
-let N = 10;    // fixed N clients  // was 100
+let max_trial = 20;                 // was 20
+let N = 100;    // fixed N clients  // was 100
 let M = 1;    // max custodians
-let T = 10;                        // was 100
+let T = 100;                        // was 100
 
 let timerOn = false;
 
@@ -26,6 +26,7 @@ contract('Custodian', function (accounts) {
     context('N voters', function () {
         it("Exp", async function(){
 
+            // Catch file prefix
             const prefix = argv['prefix'];
 
             // Create client
