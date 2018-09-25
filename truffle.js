@@ -38,6 +38,7 @@ module.exports = {
       gas: 4612388,
     },
 
+    // https://kovan.infura.io/v3/c0a7585bd72f4617800c7774c6278b28
     kovan: {
       provider: function () {
         return new HDWalletProvider(mnemonic, "https://kovan.infura.io/lMgQfS5DDh31T0z6iD5E")

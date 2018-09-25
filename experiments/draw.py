@@ -8,6 +8,13 @@ def getAve(arr):
 def getListOfFiles(re):
     return sorted(glob.glob(re))
 
+def getFirstRowOfCsv(file_name):
+    with open(file_name, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',')
+        # Retun the first row
+        for row in spamreader:
+            return row
+
 ### Global Variables
 ans = []
 fileRE = './Exp3*.csv'
@@ -15,15 +22,9 @@ fileRE = './Exp3*.csv'
 
 ### Main Execution
 for file_name in getListOfFiles(fileRE):
-    with open(file_name, newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=',')
-        for row in spamreader:
-            print(file_name, row)
-            # res = getAve(row[1:])
-            res = getAve(row)
-            
-            print(res)
-            ans.append(res)
+    row = getFirstRowOfCsv(file_name)    
+    ans.append(getAve(row))
 
+# Plot
 plt.plot(ans)
 plt.show()
