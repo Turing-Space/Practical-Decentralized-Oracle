@@ -8,6 +8,16 @@ function writeToFile(fileName, data) {
     });
 }
 
-module.exports = {
-    randBoolPos, sleep, writeToFile
+function readCsvIntoAddresses(csv_name) {
+    return new Promise(resolve => {
+        fs.readFile(csv_name, 'utf8', (err, data) => {
+            if (err) throw err;
+            resolve(data.split(","));
+        });
+    });
 }
+
+module.exports = {
+    randBoolPos, sleep, writeToFile, readCsvIntoAddresses
+}
+

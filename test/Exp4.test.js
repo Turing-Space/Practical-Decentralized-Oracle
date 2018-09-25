@@ -1,6 +1,7 @@
 const { getNow } = require("./helper/timer");
-const { sleep, writeToFile } = require("./helper/util");
+const { sleep, writeToFile, readCsvIntoAddresses } = require("./helper/util");
 const csv=require('csvtojson');
+const fs=require('fs');
 
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
@@ -18,18 +19,36 @@ let T = 100;
 
 let timerOn = false;
 
-contract('Custodian', function (accounts) {
 
-    let clients = await csv().fromFile("client_addr.csv");
-    console.log("All Clients loaded");
+
+contract('Custodian', function (accounts) {
 
     context('N voters', function () {
         it("Exp", async function(){
 
             // Create client
             clients = [];
-            for (var n = 0; n<N; n++){
-                clients[n] = await Client.new();
+
+            // Load all Client addresses
+            var addresses = await readCsvIntoAddresses('test/client_addr.csv');
+            console.log(addresses);
+            console.log(addresses.length,"clients found");
+
+            // Check whether client number read 100
+            if (addresses.length >= N) {
+                for (var n = 0; n<N; n++){
+                    clients[n] = await Client.at(addresses[n]);
+                }
+            } else {
+                var diff = N - addresses.length;
+                console.log("Need",N,"more clients");
+                var n = 0;
+                for (n = 0; n<addresses.length; n++){
+                    clients[n] = await Client.at(addresses[n]);
+                }
+                for (n=addresses.length; n<N; n++){
+                    clients[n] = await Client.new();
+                }
             }
 
             // Test different number of N
@@ -79,7 +98,7 @@ contract('Custodian', function (accounts) {
                     ans_array_per_n.push(cur_ans);
                 }
                 // Output to file (m:time)
-                writeToFile("Exp1-"+n.toString(), ans_array_per_n);
+                writeToFile("Exp4-"+n.toString(), ans_array_per_n);
             }
         }).timeout(3000000000);
     });

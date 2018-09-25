@@ -6,7 +6,7 @@ contract_addr = [];
 cnt = 0;
 for(var i=0;i<obj.length;i++){
     // console.log(obj[i])
-    if(obj[i].gasUsed == "325139"){
+    if(obj[i].gasUsed == "269543"){
         contract_addr.push(obj[i].contractAddress);
         cnt++;
     }
