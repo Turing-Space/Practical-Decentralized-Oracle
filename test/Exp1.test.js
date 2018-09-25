@@ -1,5 +1,6 @@
 const { getNow } = require("./helper/timer");
 const { sleep, writeToFile } = require("./helper/util");
+const csv=require('csvtojson');
 
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
@@ -18,15 +19,18 @@ let T = 10;                        // was 100
 let timerOn = false;
 
 contract('Custodian', function (accounts) {
+
+    let clients = await csv().fromFile("client_addr.csv");
+    console.log("All Clients loaded");
+
     context('N voters', function () {
         it("Exp", async function(){
 
             // Create client
-            clients = [];
-            for (var n = 0; n<N; n++){
-                clients[n] = await Client.new();
-            }
-            console.log("All Clients deployed");
+            // clients = [];
+            // for (var n = 0; n<N; n++){
+            //     clients[n] = await Client.new();
+            // }
 
             // Test different number of N
             for (var n = 10; n<=N; n+=10) {
