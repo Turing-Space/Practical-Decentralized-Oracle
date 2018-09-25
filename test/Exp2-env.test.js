@@ -16,6 +16,9 @@ let t2 = [];
 let max_trial = 20;
 let N = 100;    // fixed N clients
 let M = 100;    // max custodians
+let STEP = 1; 
+let START_NUM = 1;
+let EXP_NUM = "Exp2";
 
 contract('Custodian', function (accounts) {
     context('N voters', function () {
@@ -49,7 +52,7 @@ contract('Custodian', function (accounts) {
             await sleep(800);
 
             // Test different number of Consensus
-            for (var m = 10; m<=M; m+=10) {
+            for (var m = START_NUM; m<=M; m+=STEP) {
 
                 let ans_array_per_m = [];
 
@@ -86,7 +89,7 @@ contract('Custodian', function (accounts) {
                 }
 
                 // Output to file (m:time)
-                writeToFile("Exp2-"+prefix+"-"+m.toString(), ans_array_per_m);
+                writeToFile(EXP_NUM+"-"+prefix+"-"+m.toString(), ans_array_per_m);
             }
         }).timeout(3000000000);
     });
