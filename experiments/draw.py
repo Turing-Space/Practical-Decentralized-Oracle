@@ -19,14 +19,15 @@ def getFirstRowOfCsv(file_name):
 ans = []
 # fileRE = './Exp3-*.csv'
 # fileRE = './Exp1-aws-ganache-done/Exp1-aws2-*.csv'
-fileRE = './Exp1-aws-ganache-done/Exp1-aws2-*.csv'
-preChar = 26 + 13 - 5
+fileRE = './Exp3-local-ganache-done/Exp3-local-*.csv'
+preChar = 26 + 11
 postChar = 4
 
 ### Main Execution
 for file_name in getListOfFiles(fileRE,preChar,postChar):
     row = getFirstRowOfCsv(file_name)    
     ans.append(getAve(row))
+    print(file_name, row)
 
 # Plot
 plt.plot(ans)

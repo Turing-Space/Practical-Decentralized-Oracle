@@ -19,6 +19,9 @@ let max_trial = 20;                 // was 20
 let N = 300;    // fixed N clients  // was 100
 let M = 1;    // max custodians
 let T = 100;                        // was 100
+let STEP = 10; 
+let START_NUM = 110;
+let EXP_NUM = "Exp1";
 
 let timerOn = false;
 
@@ -37,7 +40,7 @@ contract('Custodian', function (accounts) {
             }
 
             // Test different number of N
-            for (var n = 10; n<=N; n+=10) {
+            for (var n = START_NUM; n<=N; n+=STEP) {
 
                 let ans_array_per_n = [];
 
@@ -83,7 +86,7 @@ contract('Custodian', function (accounts) {
                     ans_array_per_n.push(cur_ans);
                 }
                 // Output to file (m:time)
-                writeToFile("Exp1-"+prefix+"-"+n.toString(), ans_array_per_n);
+                writeToFile(EXP_NUM+"-"+prefix+"-"+n.toString(), ans_array_per_n);
             }
         }).timeout(3000000000);
     });
