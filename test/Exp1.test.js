@@ -1,112 +1,82 @@
-const { assertRevert } = require("./helper/assertRevert");
-const { getNow, getTimeDiff } = require("./helper/timer");
+const { getNow } = require("./helper/timer");
+const { sleep, writeToFile } = require("./helper/util");
 
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
-const IoT_temp = artifacts.require("IoT_temp");
-const IoT_press = artifacts.require("IoT_press");
-
-var _ = require('lodash');
-var fs = require('fs');
 
 let clients = []; // array of client contracts 
-// let clientIdToPolarity = {};
-let seq;
-let result;
-let totalVoters;
-let ioT_temp = [];
-let ioT_press = [];
-let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 let consensus = {};
-let N = 0;          // The total number of voters (can be updated according to Exp)
 let events;
 
-let t1; 
-let t2;
-let hasAllVoted = false;
-let ans = [];
+let t1 = []; 
+let t2 = [];
+let max_trial = 20;
+let N = 100;    // fixed N clients
+let M = 1;    // max custodians
+let T = 100;
 
-function randBoolPos(pos_ratio){ return (Math.random() < pos_ratio); }
-function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
-function writeToFile(fileName, data) {
-    fs.writeFile('experiments/'+fileName+'.csv', data, 'utf8', function (err) {
-        if (err) { console.log(err); }
-    });
-}
-
-
+let timerOn = false;
 
 contract('Custodian', function (accounts) {
     context('N voters', function () {
         it("Exp", async function(){
 
-            let max_trial = 20;
-            
+            // Create client
+            clients = [];
+            for (var n = 0; n<N; n++){
+                clients[n] = await Client.new();
+            }
+            console.log("All Clients deployed");
 
-            
+            // Test different number of N
+            for (var n = 10; n<=N; n+=10) {
 
-            for (var N = 60; N<101; N+=10) {
+                let ans_array_per_n = [];
 
-                let ans_array_per_N = [];
+                // Do multiple trials
+                for (var j = 0; j<max_trial; j++){
 
-                for (var j = 0; j<max_trial;j++){
+                    consensus[0] = await Custodian.new();
 
-                    // Create custodian
-                    custodian = await Custodian.new();
-                    consensus["Test"] = custodian.address;
+                    // extend voter base to n
+                    for (var _n = 0; _n<n; _n++){
+                        await clients[_n].vote(consensus[0].address, true);  // HAS AWAIT
+                    }
+                    assert.equal(await consensus[0].numOfTotalVoterClients(), n);
 
-                    // Create event
-                    events = custodian.allEvents(["latest"]);
+                    // start!
+                    t1[n] = await getNow();
+                    timerOn = true;
 
-                    // Watch event
-                    events.watch(function(error, event){
+                    // Event
+                    events = consensus[0].allEvents(["latest"]);
+                    events.watch(async function(error, event){
                         if (!error) {
-                            // console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber(), "End Time: ", getNow());
-                            
-                            // Catch t2
-                            if (hasAllVoted) { 
-                                // console.log("Event", event.event, event.args.seq,":", event.args.finalResult.toNumber(), "End Time: ", getNow());
-                                t2 = getNow(); 
-                                cur_ans = t2 - t1;
-                                console.log(N, ":", cur_ans);
-                                hasAllVoted = false;
 
-                                // Append to array
-                                ans_array_per_N.push(cur_ans);
-                                
-                                
+                            if (timerOn) {
+                                t2[n] = await getNow(); 
+                                timerOn = false;
                             }
+
                         } else { console.log(error); }
                     });
 
-                    // Extend the voter base to N
-                    for (var i = 0; i < N; i++) {
-                        clients[i] = await Client.new();
-                        // console.log("voter", i+1, "joins at", getNow());
-                        await clients[i].vote(consensus["Test"], true);  // HAS AWAIT
-                    }
+                    // terminate all camps for each consensus before start another vote camp
+                    await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
-                    // Termination
-                    await custodian.unsafeTerminateCurrentOpenedSeq();
-                    // console.log(" ========== Everything starts from here :) ========== ");
-                    await sleep(800);
+                    // all client votes
+                    for (var i = 0; i < n; i++) { clients[i].vote(consensus[0].address, false); }
+                
+                    await sleep(3000);
+                    assert.equal(await consensus[0].numOfTotalVoterClients(), n);
 
-                    // Catch t1
-                    t1 = getNow();
-                    hasAllVoted = true;
-
-                    // Extend the voter base to N (NO AWAIT)
-                    for (var i = 0; i < N; i++) { clients[i].vote(consensus["Test"], false); }
-
-                    await sleep(800);
+                    cur_ans = t2[n] - t1[n];
+                    console.log(n, ":", t2[n], t1[n], cur_ans);
+                    ans_array_per_n.push(cur_ans);
                 }
-
-                // Output to file (N:time)
-                writeToFile(N.toString(), ans_array_per_N);
+                // Output to file (m:time)
+                writeToFile("Exp1-"+n.toString(), ans_array_per_n);
             }
         }).timeout(3000000000);
-
     });
-
 });

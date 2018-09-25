@@ -1,20 +1,10 @@
-const { assertRevert } = require("./helper/assertRevert");
-const { getNow, getTimeDiff } = require("./helper/timer");
-const { randBoolPos, sleep, writeToFile } = require("./helper/util");
+const { getNow } = require("./helper/timer");
+const { sleep, writeToFile } = require("./helper/util");
 
 const Custodian = artifacts.require("Custodian");
 const Client = artifacts.require("Client");
-const IoT_temp = artifacts.require("IoT_temp");
-const IoT_press = artifacts.require("IoT_press");
 
 let clients = []; // array of client contracts 
-// let clientIdToPolarity = {};
-let seq;
-let result;
-let totalVoters;
-let ioT_temp = [];
-let ioT_press = [];
-let finalResult = {"noAgreement": 0, "true": 1, "false": 2}
 let consensus = {};
 let events;
 
@@ -42,7 +32,7 @@ contract('Custodian', function (accounts) {
             for (var m = 0; m<M; m++){
                 consensus[m] = await Custodian.new();
 
-                // All clients vote for custodian m
+                // extend voter base to N
                 for (var n = 0; n<N; n++){
                     await clients[n].vote(consensus[m].address, true);  // HAS AWAIT
                 }
@@ -85,7 +75,7 @@ contract('Custodian', function (accounts) {
                     // terminate all camps for each consensus before start another vote camp
                     await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
-                    // Extend the voter base to N (NO AWAIT)
+                    // all clients vote (NO AWAIT)
                     for (var i = 0; i < N; i++) { clients[i].vote(consensus[0].address, false); }
                 
                     await sleep(3000);
