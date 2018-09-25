@@ -42,12 +42,8 @@ module.exports = {
       provider: function () {
         return new HDWalletProvider(mnemonic, "https://kovan.infura.io/lMgQfS5DDh31T0z6iD5E")
       },
-      network_id: 44,
+      network_id: 42,
       gas: 7990000,
     },
-  },
-  // mocha: {
-  //   enableTimeouts: false
-  // }
-
+  }
 };
