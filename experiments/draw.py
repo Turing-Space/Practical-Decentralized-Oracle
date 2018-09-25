@@ -6,7 +6,7 @@ def getAve(arr):
     return sum([int(x) for x in arr]) / len(arr)
 
 def getListOfFiles(re):
-    return sorted(glob.glob(re))
+    return sorted(glob.glob(re), key=lambda s: int(s[7:-4]))
 
 def getFirstRowOfCsv(file_name):
     with open(file_name, newline='') as csvfile:
@@ -17,7 +17,7 @@ def getFirstRowOfCsv(file_name):
 
 ### Global Variables
 ans = []
-fileRE = './Exp3*.csv'
+fileRE = './Exp3-*.csv'
 
 
 ### Main Execution
