@@ -10,10 +10,10 @@ let events;
 
 let t1 = []; 
 let t2 = [];
-let max_trial = 20;
-let N = 100;    // fixed N clients
+let max_trial = 1;                 // was 20
+let N = 10;    // fixed N clients  // was 100
 let M = 1;    // max custodians
-let T = 100;
+let T = 10;                        // was 100
 
 let timerOn = false;
 
