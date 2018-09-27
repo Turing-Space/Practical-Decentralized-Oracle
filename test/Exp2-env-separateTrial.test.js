@@ -14,7 +14,7 @@ let events;
 let t1 = []; 
 let t2 = [];
 let max_trial = 20;
-let N = 100;    // fixed N clients
+let N = 20;    // fixed N clients
 let M = 20;    // max custodians 20
 let STEP = 1; 
 let START_NUM = 1;
