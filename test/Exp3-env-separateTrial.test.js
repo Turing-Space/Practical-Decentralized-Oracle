@@ -86,7 +86,7 @@ contract('Custodian', function (accounts) {
                     // all clients vote (NO AWAIT)
                     for (var i = 0; i < N; i++) { clients[i].vote(consensus[0].address, false); }
                 
-                    await sleep(3000);
+                    await sleep(5000);
 
                     cur_ans = t2[t] - t1[t];
                     console.log(t, ":", t2[t], t1[t], cur_ans);

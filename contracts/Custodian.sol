@@ -30,8 +30,6 @@ contract Custodian is ICustodian {
         campHasFinished[_seq] = true;
         last_finalized_seq = _seq;
         newly_opened_seq = keccak256(abi.encodePacked(_seq));
-        
-        emit VoteCampFinished(_seq, finalResultOnCamp[_seq]);
     }
 
     // Warning: This function is only for experiments
@@ -63,7 +61,7 @@ contract Custodian is ICustodian {
         }
         
         // check finalization
-        if ((votesCountOnCamp[_seq] > (THRESHOLD_OF_PARTICIPANTS * numOfTotalVoterClients / 100))) {
+        if ((votesCountOnCamp[_seq] >= (THRESHOLD_OF_PARTICIPANTS * numOfTotalVoterClients / 100))) {
             if (currVotesBalanceOnCamp[_seq] > 0) { 
                 finalResultOnCamp[_seq] = 1;
             } else if (currVotesBalanceOnCamp[_seq] < 0) {
