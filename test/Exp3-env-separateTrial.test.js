@@ -38,7 +38,7 @@ contract('Custodian', function (accounts) {
             console.log("All Clients deployed");
 
             // Create custodian
-            for (var m = 0; m<M; m++){
+            for (var m = START_NUM; m<=T; m+=STEP){
                 consensus[m] = await Custodian.new();
 
                 // extend voter base to N
@@ -60,16 +60,16 @@ contract('Custodian', function (accounts) {
 
                 // Test different number of Threshold
                 for (var t = START_NUM; t<=T; t+=STEP) {
-                    await consensus[0].unsafeSetThreshold(t);
-                    assert.equal(await consensus[0].THRESHOLD_OF_PARTICIPANTS(), t);
-                    console.log("Threshold", await consensus[0].THRESHOLD_OF_PARTICIPANTS(), t);
+                    await consensus[t].unsafeSetThreshold(t);
+                    assert.equal(await consensus[t].THRESHOLD_OF_PARTICIPANTS(), t);
+                    console.log("Threshold", await consensus[t].THRESHOLD_OF_PARTICIPANTS(), t);
 
                         // start!
                         t1[t] = await getNow();
                         timerOn = true;
 
                         // Event
-                        events = consensus[0].allEvents(["latest"]);
+                        events = consensus[t].allEvents(["latest"]);
                         events.watch(async function(error, event){
                             if (!error) {
 
@@ -82,10 +82,10 @@ contract('Custodian', function (accounts) {
                         });
 
                         // terminate all camps for each consensus before start another vote camp
-                        await consensus[0].unsafeTerminateCurrentOpenedSeq();
+                        await consensus[t].unsafeTerminateCurrentOpenedSeq();
 
                         // all clients vote (NO AWAIT)
-                        for (var i = 0; i < N; i++) { clients[i].vote(consensus[0].address, false); }
+                        for (var i = 0; i < N; i++) { clients[i].vote(consensus[t].address, false); }
                     
                         await sleep(5000);
 

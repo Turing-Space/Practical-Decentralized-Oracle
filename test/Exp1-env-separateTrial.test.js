@@ -43,9 +43,10 @@ contract('Custodian', function (accounts) {
             for (var j = 1; j<=max_trial; j++){
                 let ans_array_per_trial = [];
 
-            // Test different number of N
-            for (var n = START_NUM; n<=N; n+=STEP) {
+                // Test different number of N
+                for (var n = START_NUM; n<=N; n+=STEP) {
                     consensus[0] = await Custodian.new();
+                    
 
                     // extend voter base to n
                     for (var _n = 0; _n<n; _n++){
