@@ -38,7 +38,7 @@ contract('Custodian', function (accounts) {
             console.log("All Clients deployed");
 
             // Create custodian
-            for (var m = START_NUM; m<=T; m+=STEP){
+            for (var m = 0; m<M; m++){
                 consensus[m] = await Custodian.new();
 
                 // extend voter base to N
@@ -60,38 +60,50 @@ contract('Custodian', function (accounts) {
 
                 // Test different number of Threshold
                 for (var t = START_NUM; t<=T; t+=STEP) {
-                    await consensus[t].unsafeSetThreshold(t);
-                    assert.equal(await consensus[t].THRESHOLD_OF_PARTICIPANTS(), t);
-                    console.log("Threshold", await consensus[t].THRESHOLD_OF_PARTICIPANTS(), t);
+                    await consensus[0].unsafeSetThreshold(t);
+                    assert.equal(await consensus[0].THRESHOLD_OF_PARTICIPANTS(), t);
+                    // console.log("Threshold", await consensus[0].THRESHOLD_OF_PARTICIPANTS(), t);
 
                         // start!
                         t1[t] = await getNow();
                         timerOn = true;
+                        counter = 0;
 
                         // Event
-                        events = consensus[t].allEvents(["latest"]);
+                        events = consensus[0].allEvents(["latest"]);
                         events.watch(async function(error, event){
                             if (!error) {
-
-                                if (timerOn) {
+                                console.log("Caught:", event.args.seq);
+                                if (timerOn != false) {
+                                    console.log("Awesome Caught:", event.args.seq);
                                     t2[t] = await getNow(); 
                                     timerOn = false;
+                                    counter++;
                                 }
 
                             } else { console.log(error); }
                         });
 
                         // terminate all camps for each consensus before start another vote camp
-                        await consensus[t].unsafeTerminateCurrentOpenedSeq();
+                        await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
                         // all clients vote (NO AWAIT)
-                        for (var i = 0; i < N; i++) { clients[i].vote(consensus[t].address, false); }
+                        for (var i = 0; i < N; i++) { 
+                            if (!timerOn) {
+                                console.log("DONE:", t);
+                                break;
+                            } 
+                            console.log(timerOn);
+                            clients[i].vote(consensus[0].address, false); 
+                            await sleep(100);
+                        }
                     
-                        await sleep(5000);
+                        await sleep(7000);
 
                         cur_ans = t2[t] - t1[t];
                         console.log(t, ":", t2[t], t1[t], cur_ans);
                         ans_array_per_trial.push(cur_ans);
+                        console.log("Counts",counter);
                     }
                 // Output to file (m:time)
                 writeToFile(EXP_NUM+"-"+prefix+"-#trial"+j.toString(), ans_array_per_trial);

@@ -16,11 +16,11 @@ let t1 = [];
 let t2 = [];
 let max_trial = 20;                 // was 20
 // let N = 100;    // fixed N clients  // was 100
-let N = 50;    // fixed N clients  // was 100
+let N = 300;    // fixed N clients  // was 100
 let M = 1;    // max custodians
 let T = 100;                        // was 100
-let STEP = 1; 
-let START_NUM = 1;
+let STEP = 10; 
+let START_NUM = 10;
 let EXP_NUM = "Exp1";
 
 let timerOn = false;
