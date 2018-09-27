@@ -16,11 +16,11 @@ let t1 = [];
 let t2 = [];
 let max_trial = 20;                 // was 20
 // let N = 100;    // fixed N clients  // was 100
-let N = 300;    // fixed N clients  // was 100
+let N = 50;    // fixed N clients  // was 100
 let M = 1;    // max custodians
 let T = 100;                        // was 100
-let STEP = 10; 
-let START_NUM = 10;
+let STEP = 1; 
+let START_NUM = 1;
 let EXP_NUM = "Exp1";
 
 let timerOn = false;
@@ -74,7 +74,10 @@ contract('Custodian', function (accounts) {
                     await consensus[0].unsafeTerminateCurrentOpenedSeq();
 
                     // all client votes
-                    for (var i = 0; i < n; i++) { clients[i].vote(consensus[0].address, false); }
+                    for (var i = 0; i < n; i++) { 
+                        if(!timerOn) break;
+                        clients[i].vote(consensus[0].address, false); 
+                    }
                 
                     await sleep(3000);
                     assert.equal(await consensus[0].numOfTotalVoterClients(), n);
