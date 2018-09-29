@@ -67,18 +67,18 @@ contract('Custodian', function (accounts) {
                         // start!
                         t1[t] = await getNow();
                         timerOn = true;
-                        counter = 0;
+                        // counter = 0;
 
                         // Event
                         events = consensus[0].allEvents(["latest"]);
                         events.watch(async function(error, event){
                             if (!error) {
-                                console.log("Caught:", event.args.seq);
+                                // console.log("Caught:", event.args.seq);
                                 if (timerOn != false) {
-                                    console.log("Awesome Caught:", event.args.seq);
+                                    // console.log("Awesome Caught:", event.args.seq);
                                     t2[t] = await getNow(); 
                                     timerOn = false;
-                                    counter++;
+                                    // counter++;
                                 }
 
                             } else { console.log(error); }
@@ -89,13 +89,13 @@ contract('Custodian', function (accounts) {
 
                         // all clients vote (NO AWAIT)
                         for (var i = 0; i < N; i++) { 
-                            if (!timerOn) {
-                                console.log("DONE:", t);
-                                break;
-                            } 
-                            console.log(timerOn);
+                            // if (!timerOn) {
+                            //     // console.log("DONE:", t);
+                            //     break;
+                            // } 
+                            // console.log(timerOn);
                             clients[i].vote(consensus[0].address, false); 
-                            await sleep(100);
+                            // await sleep(100);
                         }
                     
                         await sleep(7000);
@@ -103,7 +103,7 @@ contract('Custodian', function (accounts) {
                         cur_ans = t2[t] - t1[t];
                         console.log(t, ":", t2[t], t1[t], cur_ans);
                         ans_array_per_trial.push(cur_ans);
-                        console.log("Counts",counter);
+                        // console.log("Counts",counter);
                     }
                 // Output to file (m:time)
                 writeToFile(EXP_NUM+"-"+prefix+"-#trial"+j.toString(), ans_array_per_trial);
