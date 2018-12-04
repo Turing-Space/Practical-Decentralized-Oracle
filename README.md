@@ -1,8 +1,6 @@
-# Practical Decentralized Oracle
+## Analyzing Smart Contract Interactions and Contract Level State Consensus
 
-A decentralized oracle network considering latency, liveness, and Byzantine fault tolerance
-
-## Usage
+### Usage
 
 1. Install dependencies
 
